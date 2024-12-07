@@ -1,12 +1,9 @@
 //requirements
-//import guessing game, oracle, and bnh
-//overall gameplay loop
-//Display game results after each game session in alerts, not html or console
-//After oking game session alert, send prompt "${nameTag}, Would you like to keep playing this game? y/n"
-// if yes, game starts over. otherwise send message "${nameTag}, Would you like to pick another game to play? y/n"
-//if yes, reveal buttons, if no, in html, say a nice goodbye and offer reset button
-//use alerts to handle improper entry etc
-//include player name in EACH UX FEEDBACK DIALOGUE
+//Track statistics
+//Number of games played
+//Number of total wins
+//Win percentage
+//Display these in farewell as HTML table
 
 //global variables, all functions must be able to access 
 
