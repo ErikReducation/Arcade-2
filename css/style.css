@@ -1,0 +1,16 @@
+#main {
+    color:blueviolet;
+    text-align: center;
+    margin: 25px 25px 25px 25px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+h1{
+    color:purple;
+    font-family:'Courier New', Courier, monospace;
+}
+
+button {
+    color:blue;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
