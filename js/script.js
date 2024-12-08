@@ -5,6 +5,8 @@
 //Win percentage
 //Display these in farewell as HTML table
 
+
+
 //global variables, all functions must be able to access 
 
 //for name entry
@@ -14,22 +16,36 @@ let nameValid = false;
 
 //for loop controls
 let playAgain = '';//dummy checkstring
-//let donePlayingAll = false;
 let valid = false;//dummy bool for input sanitization dowhile loops
-//lines 23-31 do not work, because infinite loops do not work. Code moved inside functions. 
-//play session loop
 
-//do {
-
-//} while (!donePlayingAll)
-
-//goodbye happens when play session loop is terminated by user response during a function call
-//document.getElementById("main").innerHTML = `Goodbye, ${nameTag}. May we meet again!`//overwrite buttons
-//document.getElementById("main").innerHTML += "<button onClick='window.location.href=window.location.href'>Reset</button>"//add reset button
+//statistics
+let timesPlayed = 0;
+let wins = 0;
 
 //functions
 
+function buildMyTable() { //build the results table. In function because it's something I want to do multiple times 
+    //and I don't want to write this code 3 times. Can't be a variable at the top of the js file because it will be initialized once
+    //and won't be updated, even if used in a template literal later. It's pretty cool that you can put template literals
+    //in a function and then put a function into template literals and add that to HTML!
+    return `<br><br>
+    <table name="resultsTable" id="resultsTable">
+    <tr>
+        <th>Games Played</th>
+        <th>Wins</th>
+        <th>Win Percentage</th>
+    </tr>
+    <tr>
+        <td>${timesPlayed}</td>
+        <td>${wins}</td>
+        <td>${(wins/timesPlayed)*100}%</td>
+    </tr>
+    </table>`;
+}
+
 function guess() {//guessing game
+
+let doneGuessing = false;//loop control variable
 
 //handle first session name
 if (nameEmpty) {
@@ -44,46 +60,50 @@ if (nameEmpty) {
     } while (!nameValid)
 } 
 //game loop
-let doneGuessing = false;
 do {
-    let targetNum = Math.floor(Math.random() * 10) +1;
+    let targetNum = Math.floor(Math.random() * 10) +1;//get a number to guess
+	let latestGuess = prompt(`${nameTag}, guess a number between 1 and 10.`);//initialize variable for while loop
+	let tries =0;//count tries for this guessing game session
 
-	let latestGuess = prompt(`${nameTag}, guess a number between 1 and 10.`);//initialize variables
-
-	let tries =0;
+    timesPlayed++;//iterate timesPlayed at the beginning of gameloop for accurate counting
 
 	while (latestGuess != targetNum) {//enter loop
     if (latestGuess === null){//cancel
         latestGuess = prompt(`Nice try, ${nameTag}! You have to guess a number.`);
 		tries++;
     }
-	else if (latestGuess.trim().length === 0){//ok or empty
+	else if (latestGuess.trim().length === 0){//ok, empty, or whitespace
         latestGuess = prompt(`Nice try, ${nameTag}! You have to guess a number.`);
 		tries++;
 
-    }else if (latestGuess > targetNum) {
+    }else if (latestGuess > targetNum) {//guess higher than target
 		latestGuess = prompt(`${nameTag}, guess was too high, guess again.`);
 		tries++;
 		
-	} else if (latestGuess < targetNum) {
+	} else if (latestGuess < targetNum) {//guess less than target
 		latestGuess = prompt(`${nameTag}, guess was too low, guess again.`);
 		tries++;
-	} else {//letters, characters, and whitespace entries
+	} else {//letters and special characters
 		latestGuess = prompt(`Nice try, ${nameTag}! You have to guess a number.`);
 		tries++;
 	}
 	}
 	if (tries >0) {//if entered loop
+        tries++;//due to using pretest loop vs post test loop, last correct try is not counted because loop is not entered.
 		alert(`${nameTag}, you guessed it in ${tries} guesses!`);
+        wins++;
 	} else {//if skipped loop
 		alert(`Wow! ${nameTag}, you guessed it right on your first try!`);
-	}
+        wins++;
+	}//It is only possible to win playing the guessing game because one complete game requires you find the right answer. 
+     //This makes it a great game to play if you're trying for a high score at the arcade.. haha.
+
 //play again?
     do {
     playAgain = prompt(`${nameTag}, Would you like to keep playing this game? y/n`);
     if (playAgain != null)//sanitize before calling tolowercase
     {
-        if (playAgain.toLowerCase() === "y"){
+        if (playAgain.toLowerCase() === "y"){//keep playing
         doneGuessing = false;
         valid = true;
         } else if (playAgain.toLowerCase() === "n"){//exit this game
@@ -109,11 +129,10 @@ do {
         if (playAgain.toLowerCase() === "y"){
         valid = true;//exit this loop, then exit function, so returns to main game session loop
         } else if (playAgain.toLowerCase() === "n"){//exit main game session loop
-        //donePlayingAll = true;//sets global variable controlling main game session loop to true. After main game session loop and before functions are defined, 
-        //html will be overwritten to goodbye and reset button.
-        //just kidding, it will be done right here:
+        //html will be overwritten to goodbye, reset button, and table.
         document.getElementById("main").innerHTML = `Goodbye, ${nameTag}. May we meet again! <br><br>`//overwrite buttons
         document.getElementById("main").innerHTML += "<button onClick='window.location.href=window.location.href'>Reset</button>"//add reset button
+        document.getElementById("main").innerHTML += `${buildMyTable()}`;
         valid = true;
         } else {//input isn't y or n
         alert(`${nameTag}, input should be Y or N, case insensitive!`);
@@ -128,6 +147,22 @@ do {
 } 
 
 let delphi = function() {//magic eight ball
+    
+//variables
+
+let input = "";
+let doneSoothing = false;
+let fateIndex = 0;
+const fates = [
+    'Your fortunes are grim. Bathe in holy water, do not enter cemeteries for a month, and refrain from starting fires. \n The answer is no.' ,//bad
+    'Your fortunes speak of misery and anguish. Beware water. Beware caves. Travel to a holy place and beg forgiveness. \n The answer is no.' ,
+    'Your fortunes are obscured. I cannot penetrate the clouds you have laid over your life. \n Try again.' ,//ask again
+    'Fate is not accepting visitors today. \n Try again.' ,
+    'Magic is not real! Read a book! \n Undecided.' ,//neither lucky nor unlucky
+    'Fortune has deserted you. You are neither lucky nor unlucky. Your profits and losses are yours to own. \n Undecided.' ,
+    'Fortune smiles upon you. Talk to your ex. \n The answer is yes.' ,//go for it
+    'Fortune favors you. Bless those around you, and your luck will be magnified. Your favorite artist will release a new album shortly. \n The answer is yes.'
+];
 
 //handle first session name
 if (nameEmpty){
@@ -143,21 +178,9 @@ if (nameEmpty){
 } 
 //game loop
 
-    let input = "";
-    let doneSoothing = false;
-    let fateIndex = 0;
-    const fates = [
-        'Your fortunes are grim. Bathe in holy water, do not enter cemeteries for a month, and refrain from starting fires. \n The answer is no.' ,//bad
-        'Your fortunes speak of misery and anguish. Beware water. Beware caves. Travel to a holy place and beg forgiveness. \n The answer is no.' ,
-        'Your fortunes are obscured. I cannot penetrate the clouds you have laid over your life. \n Try again.' ,//ask again
-        'Fate is not accepting visitors today. \n Try again.' ,
-        'Magic is not real! Read a book! \n Undecided.' ,//neither lucky nor unlucky
-        'Fortune has deserted you. You are neither lucky nor unlucky. Your profits and losses are yours to own. \n Undecided.' ,
-        'Fortune smiles upon you. Talk to your ex. \n The answer is yes.' ,//go for it
-        'Fortune favors you. Bless those around you, and your luck will be magnified. Your favorite artist will release a new album shortly. \n The answer is yes.'
-    ];
     //gameplay loop
     do {
+        timesPlayed++;
         do {
         input = prompt(`Hello, ${nameTag}. Ask your question, and your fortune will be revealed by the magic ball.`);
         if (input != null && input.trim().length!=0) //check for whitespace string, empty string, or cancelled prompt
@@ -196,10 +219,6 @@ if (nameEmpty){
 
     } while (!doneSoothing)
     
-    //Functions
-    function getRandomInt(max) {
-      return Math.floor(Math.random() * max);
-    }    
 
 
 //handle done with play session prompt (sends user back to buttons or to goodbye)
@@ -210,11 +229,10 @@ do {
         if (playAgain.toLowerCase() === "y"){
         valid = true;//exit this loop, then exit function, so returns to main game session loop
         } else if (playAgain.toLowerCase() === "n"){//exit main game session loop
-        //donePlayingAll = true;//sets global variable controlling main game session loop to true. After main game session loop and before functions are defined, 
-        //html will be overwritten to goodbye and reset button.
-        //just kidding, it will be done right here:
+        //html will be overwritten to goodbye, reset button, and table.
         document.getElementById("main").innerHTML = `Goodbye, ${nameTag}. May we meet again! <br><br>`//overwrite buttons
         document.getElementById("main").innerHTML += "<button onClick='window.location.href=window.location.href'>Reset</button>"//add reset button
+        document.getElementById("main").innerHTML += `${buildMyTable()}`;
         valid = true;
         } else {//input isn't y or n
         alert(`${nameTag}, input should be Y or N, case insensitive!`);
@@ -225,11 +243,28 @@ do {
         valid = false;
     }
 } while (!valid)
+
+//Internal soothing functions
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}    
 };
 
 let gladiator = () => {//bear ninja hunter
 
-//handle first sesion name
+//variables
+
+const halStrat = ['bear', 'ninja', 'hunter'];//computer options
+let halChoice = 0; //default bear
+let userChoice = '';
+let doneFighting = false;//gameplay loop control
+let winTotal = 0;//internal scoreboard for one game session (user enters "y", play BNH again)
+let loseTotal = 0;//""
+let tieTotal = 0;//""
+let currentDate = null;//for countdown
+let outcome = ''; //stores result of switch 
+
+//handle first session name
 if (nameEmpty){
     do {
     nameTag = prompt("Welcome to the arcade, and thanks for playing. What's your name?");
@@ -243,18 +278,9 @@ if (nameEmpty){
 }
 //game loop
 
-const halStrat = ['bear', 'ninja', 'hunter'];//computer options
-let halChoice = 0; //default bear
-let userChoice = '';
-let doneFighting = false;
-let winTotal = 0;
-let loseTotal = 0;
-let tieTotal = 0;
-let currentDate = null;//for countdown
-let greeting = "Hi " + nameTag +  " Let\'s Play!";
-
 do {
-    alert(`${greeting}`);
+    timesPlayed++;//iterate global counter
+    alert("Hi " + nameTag + " Let\'s Play!");
 
     halChoice = halStrat[Math.floor(Math.random() * 3)]; // computer rolls one of 3 from array at random. Possible values: 0,1,2 => bear, ninja, hunter
     //user picks one of three roles
@@ -338,7 +364,6 @@ else if (halChoice === 'ninja') {
 } else {}
 
 //partitioned switch
-let outcome = '';
 switch (lineup) {
     case 1:
     case 2:
@@ -355,13 +380,18 @@ switch (lineup) {
     case 9:
         outcome = 'lose';
         break;
+    default://shouldn't be possible but you never know
+        outcome = 'lose';
+        console.log("How did this even happen?");
+        break;
 }
 
 //results
 
 if (outcome === 'win') {
 alert(`${nameTag}, you Win!!`);
-winTotal++;//increment for overall stats
+winTotal++;//increment for overall stats for this game session
+wins++;//global tracker for play session
 }
 //lose
 else if (outcome === 'lose') {
@@ -413,11 +443,10 @@ do {
         if (playAgain.toLowerCase() === "y"){
         valid = true;//exit this loop, then exit function, so returns to main game session loop
         } else if (playAgain.toLowerCase() === "n"){//exit main game session loop
-        //donePlayingAll = true;//sets global variable controlling main game session loop to true. After main game session loop and before functions are defined, 
-        //html will be overwritten to goodbye and reset button.
-        //just kidding, it will be done right here:
+        //html will be overwritten to goodbye, reset button, and table.
         document.getElementById("main").innerHTML = `Goodbye, ${nameTag}. May we meet again! <br><br>`//overwrite buttons
         document.getElementById("main").innerHTML += "<button onClick='window.location.href=window.location.href'>Reset</button>"//add reset button
+        document.getElementById("main").innerHTML += `${buildMyTable()}`;
         valid = true;
         } else {//input isn't y or n
         alert(`${nameTag}, input should be Y or N, case insensitive!`);
