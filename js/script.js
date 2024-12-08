@@ -186,6 +186,10 @@ if (nameEmpty){
         if (input != null && input.trim().length!=0) //check for whitespace string, empty string, or cancelled prompt
         {
             fateIndex = getRandomInt(8);//assigns fateIndex to 0-7, the start and end of my array
+	    //check to see if magic 8 ball result is win
+	    if (fateIndex === 6 || fateIndex === 7) {
+		wins++;
+	    }
             alert(fates[fateIndex]);//Get fortune
             valid = true;
         }
